@@ -255,12 +255,12 @@ Kalau cara pertama gagal, bisa menggunakan cara kedua. Ini caranya:
    apt-get install linux-headers-6.16.8+kali-amd64
    ```
 
-   Blacklist driver bawaan kernel:
+   Blacklist driver bawaan kernel Linux:
 
    ```
    nano /etc/modprobe.d/blacklist-rtl8xxxu.conf
    ```
-
+   
    Isi dengan:
 
    ```
@@ -268,12 +268,11 @@ Kalau cara pertama gagal, bisa menggunakan cara kedua. Ini caranya:
    blacklist r8188eu
    ```
 
-   Unload driver lama dan load driver baru:
+   Update sistem agar blacklist aktif:
    
    ```
-   modprobe -r rtl8xxxu
-   modprobe -r r8188eu
-   modprobe 8188eu
+   update-initramfs -u
+   depmod -a
    ```
 
    Restart Kali Linux:
@@ -302,6 +301,22 @@ Kalau cara pertama gagal, bisa menggunakan cara kedua. Ini caranya:
    ```
    
    Versi kernel sudah diperbarui yang tadinya versi `6.12.38+kali-amd64` menjadi versi `6.16.8+kali-amd64`.
+1. Load driver baru:
+   
+   ```
+   modprobe 8188eu
+   ```
+1. Verifikasi perubahan:
+
+   ```
+   lsmod | grep 8188
+   ```
+
+   Outputnya:
+
+   ```
+   8188eu
+   ```
 1. Pastikan driver sudah benar:
    
    ```
@@ -312,35 +327,6 @@ Kalau cara pertama gagal, bisa menggunakan cara kedua. Ini caranya:
 
    ```
    driver: 8188eu
-   ```
-1. Instal lagi drivernya:
-   
-   ```
-   apt-get install realtek-rtl8188eus-dkms
-   ```
-   
-   Kalau muncul output seperti ini:
-   
-   ```
-   Reading package lists... Done
-   Building dependency tree... Done
-   Reading state information... Done
-   realtek-rtl8188eus-dkms is already the newest version (5.3.9~git20250929.52bd147-0kali1).
-   0 upgraded, 0 newly installed, 0 to remove and 1171 not upgraded.
-   ```
-   
-   Itu artinya, driver berhasil diinstal via APT + DKMS.
-
-   Cek statusnya:
-   
-   ```
-   dkms status
-   ```
-   
-   Outputnya:
-   
-   ```
-   realtek-rtl8188eus/5.3.9~git20250929.52bd147, 6.16.8+kali-amd64, x86_64: installed
    ```
 1. Cek apakah interfacenya muncul:
    
@@ -449,18 +435,6 @@ Kalau cara pertama dan kedua gagal, bisa menggunakan cara ketiga. Ini caranya:
    ```
    cd rtl8188eus
    ```
-1. Blacklist driver bawaan kernel:
-
-   ```
-   nano /etc/modprobe.d/blacklist-rtl8xxxu.conf
-   ```
-
-   Isi dengan:
-
-   ```
-   blacklist rtl8xxxu
-   blacklist r8188eu
-   ```
 1. Instal driver:
 
    Ada 2 metode untuk menginstal driver secara manual, yaitu:
@@ -475,119 +449,56 @@ Kalau cara pertama dan kedua gagal, bisa menggunakan cara ketiga. Ini caranya:
    **Compile**:
 
    ```
-   # 1. Compile driver
-   $ make
-
-   # 2. Instal modul hasil compile ke sistem
-   $ make install
-
-   # 3. Unload driver lama
-   modprobe -r rtl8xxxu
-   modprobe -r r8188eu
-
-   # 4. Load driver baru
-   modprobe 8188eu
-
-   # 5. Restart Kali Linux
-   $ reboot
+   make
+   make install
    ```
-
-   Kalau muncul output error seperti ini pada saat kompilasi:
-
-   ```
-   make ARCH=x86_64 CROSS_COMPILE= -C /lib/modules/6.16.8+kali-amd64/build M=/root/rtl8188eus  modules
-   make[1]: Entering directory '/usr/src/linux-headers-6.16.8+kali-amd64'
-   make[2]: Entering directory '/root/rtl8188eus'
-     CC [M]  core/rtw_cmd.o
-   core/rtw_cmd.c:17:10: fatal error: drv_types.h: No such file or directory
-      17 | #include <drv_types.h>
-         |          ^~~~~~~~~~~~~
-   compilation terminated.
-   make[4]: *** [/usr/src/linux-headers-6.16.8+kali-common/scripts/Makefile.build:292: core/rtw_cmd.o] Error 1
-   make[3]: *** [/usr/src/linux-headers-6.16.8+kali-common/Makefile:2027: .] Error 2
-   make[2]: *** [/usr/src/linux-headers-6.16.8+kali-common/Makefile:260: __sub-make] Error 2
-   make[2]: Leaving directory '/root/rtl8188eus'
-   make[1]: *** [/usr/src/linux-headers-6.16.8+kali-common/Makefile:260: __sub-make] Error 2
-   make[1]: Leaving directory '/usr/src/linux-headers-6.16.8+kali-amd64'
-   make: *** [Makefile:2065: modules] Error 2
-   ```
-
-   Error tersebut terjadi karena source driver `rtl8188eus` yang sedang dikompilasi tidak kompatibel dengan kernel Kali Linux versi `6.16.8`. Source code driver masih memanggil header `drv_types.h`, sementara file tersebut tidak ditemukan atau sudah tidak disertakan dalam struktur driver maupun tidak lagi sesuai dengan perubahan API pada kernel terbaru. Akibatnya, proses kompilasi gagal karena compiler tidak dapat menemukan dependensi yang dibutuhkan oleh file `rtw_cmd.c`.
-
-   Dengan kata lain, driver yang digunakan merupakan versi lama yang belum mendukung kernel modern, sehingga terjadi konflik saat proses build dan menyebabkan error kompilasi.
-
-   Bersihkan menggunakan:
-
-   ```
-   make clean
-   ```
-
-   Coba instal Via DKMS.
    
    **Via DKMS**:
 
    ```
-   # 1. Instal driver Via DKMS
-   $ ./dkms-install.sh
-
-   # 2. Unload driver lama
-   modprobe -r rtl8xxxu
-   modprobe -r r8188eu
-
-   # 3. Load driver baru
-   modprobe 8188eu
-
-   # 4. Restart Kali Linux
-   $ reboot
+   ./dkms-install.sh
    ```
-
-   Kalau muncul output error seperti ini pada saat menginstal driver via DKMS:
+1. Blacklist driver bawaan kernel Linux:
 
    ```
-   About to run dkms install steps...
-   Deprecated feature: REMAKE_INITRD (/usr/src/8188eu-5.3.9/dkms.conf)
-   Creating symlink /var/lib/dkms/8188eu/5.3.9/source -> /usr/src/8188eu-5.3.9
-   Deprecated feature: REMAKE_INITRD (/var/lib/dkms/8188eu/5.3.9/source/dkms.conf)
-   Sign command: /lib/modules/6.16.8+kali-amd64/build/scripts/sign-file
-   Signing key: /var/lib/dkms/mok.key
-   Public certificate (MOK): /var/lib/dkms/mok.pub
-
-   Building module(s)...(bad exit status: 2)
-   Failed command:
-   'make' -j3 KVER=6.16.8+kali-amd64 KSRC=/lib/modules/6.16.8+kali-amd64/build
-
-   Error! Bad return status for module build on kernel: 6.16.8+kali-amd64 (x86_64)
-   Consult /var/lib/dkms/8188eu/5.3.9/build/make.log for more information.
-   Deprecated feature: REMAKE_INITRD (/var/lib/dkms/8188eu/5.3.9/source/dkms.conf)
-   Sign command: /lib/modules/6.16.8+kali-amd64/build/scripts/sign-file
-   Signing key: /var/lib/dkms/mok.key
-   Public certificate (MOK): /var/lib/dkms/mok.pub
-
-   Building module(s)...(bad exit status: 2)
-   Failed command:
-   'make' -j3 KVER=6.16.8+kali-amd64 KSRC=/lib/modules/6.16.8+kali-amd64/build
-
-   Error! Bad return status for module build on kernel: 6.16.8+kali-amd64 (x86_64)
-   Consult /var/lib/dkms/8188eu/5.3.9/build/make.log for more information.
-   Finished running dkms install steps.
+   nano /etc/modprobe.d/blacklist-rtl8xxxu.conf
    ```
    
-   Error ini terjadi karena driver `8188eu` yang dipasang lewat DKMS tidak kompatibel dengan kernel `6.16.8`, sehingga proses kompilasi modul gagal (`bad exit status: 2`). Peringatan `Deprecated feature: REMAKE_INITRD` hanyalah peringatan, sedangkan penyebab utama kegagalan adalah source driver lama yang tidak cocok dengan kernel modern. Solusinya, gunakan driver versi terbaru yang mendukung kernel `6.x` atau driver bawaan `rtl8xxxu`.
-
-   Bersihkan menggunakan:
+   Isi dengan:
 
    ```
-   dkms remove 8188eu/5.3.9 --all
+   blacklist rtl8xxxu
+   blacklist r8188eu
    ```
+1. Update sistem agar blacklist aktif:
    
-   Kalau tidak ada error pada saat kompilasi baik menggunakan metode Compile atau Via DKMS bisa ke langkah selanjutnya.
+   ```
+   update-initramfs -u
+   depmod -a
+   ```
 1. Restart Kali Linux:
 
    ```
    reboot
    ```
-1. Pastikan driver sudah benar:
+1. Load driver baru:
 
+   ```
+   modprobe 8188eu
+   ```
+1. Verifikasi perubahan:
+
+   ```
+   lsmod | grep 8188
+   ```
+
+   Outputnya:
+
+   ```
+   8188eu
+   ```
+1. Pastikan driver sudah benar:
+   
    ```
    ethtool -i wlan0
    ```
@@ -719,6 +630,47 @@ Kalau cara pertama, kedua, dan ketiga gagal, bisa menggunakan cara keempat. Ini 
 
    ```
    5.15.5-051505-generic
+   ```
+1. Blacklist driver bawaan kernel Linux:
+
+   ```
+   nano /etc/modprobe.d/blacklist-rtl8xxxu.conf
+   ```
+
+   Isi dengan:
+
+   ```
+   blacklist rtl8xxxu
+   blacklist r8188eu
+   ```
+1. Unload driver lama dan load driver baru:
+   
+   ```
+   modprobe -r rtl8xxxu
+   modprobe -r r8188eu
+   modprobe 8188eu
+   ```
+1. Verifikasi perubahan:
+
+   ```
+   lsmod | grep 8188
+   ```
+
+   Outputnya:
+
+   ```
+   8188eu
+   ```
+1. Pastikan driver sudah benar:
+   
+   ```
+   ethtool -i wlan0
+   ```
+
+   Outputnya:
+
+   ```
+   driver: 8188eu
    ```
 1. Cek apakah interfacenya muncul:
    
