@@ -268,6 +268,13 @@ Kalau cara pertama gagal, bisa menggunakan cara kedua. Ini caranya:
    blacklist r8188eu
    ```
 
+   Unload driver bawaan kerel Linux:
+
+   ```
+   modprobe -r rtl8xxxu
+   modprobe -r r8188eu
+   ```
+   
    Update sistem agar blacklist aktif:
    
    ```
@@ -470,6 +477,12 @@ Kalau cara pertama dan kedua gagal, bisa menggunakan cara ketiga. Ini caranya:
    blacklist rtl8xxxu
    blacklist r8188eu
    ```
+1. Unload driver bawaan kerel Linux:
+
+   ```
+   modprobe -r rtl8xxxu
+   modprobe -r r8188eu
+   ```
 1. Update sistem agar blacklist aktif:
    
    ```
@@ -628,6 +641,12 @@ Kalau cara pertama, kedua, dan ketiga gagal, bisa menggunakan cara keempat. Ini 
    ```
    blacklist rtl8xxxu
    blacklist r8188eu
+   ```
+1. Unload driver bawaan kerel Linux:
+
+   ```
+   modprobe -r rtl8xxxu
+   modprobe -r r8188eu
    ```
 1. Update sistem agar blacklist aktif:
    
