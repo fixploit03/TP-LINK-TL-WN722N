@@ -11,6 +11,14 @@
 > 
 > Penulis tidak bertanggung jawab atas segala bentuk kerusakan, pelanggaran hukum, kehilangan data, atau konsekuensi lain yang timbul akibat penggunaan informasi dari repositori ini, baik secara langsung maupun tidak langsung.
 
+## Persyaratan
+
+- PC/Laptop
+- VirtualBox/VMware
+- Kali Linux 2025.3
+- Adapter Wi-Fi TP-LINK TL-WN722N V2/V3
+- Koneksi internet
+
 ## Informasi Hardware
 
 - **Chipset**: Realtek RTL8188EUS
@@ -33,14 +41,6 @@
 ![](https://github.com/fixploit03/TP-LINK-TL-WN722N-V2/blob/main/img/4.png)
 
 Saat menggunakan adapter Wi-Fi TP-LINK TL-WN722N (V2/V3), sering mengalami masalah saat dipakai di Kali Linux, terutama saat melakukan scanning Wi-Fi dengan `airodump-ng`. Target Access Point kadang tidak muncul atau bahkan tidak terdeteksi sama sekali.
-
-## Persyaratan
-
-- PC/Laptop
-- VirtualBox/VMware
-- Kali Linux 2025.3
-- Adapter Wi-Fi TP-LINK TL-WN722N V2/V3
-- Koneksi internet
 
 ## Cara Mengatasi Masalah
 
