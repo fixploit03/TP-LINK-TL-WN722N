@@ -105,13 +105,13 @@ file_deb=(
 # Melakukan blacklist pada driver bawaan kernel Linux
 echo -e "${b}[*] ${p}Melakukan blacklist pada driver bawaan kernel Linux...${r}"
 sleep 3
-if echo 'blacklist r8188eu' | sudo tee '/etc/modprobe.d/realtek.conf'; then
+if echo 'blacklist r8188eu' | tee '/etc/modprobe.d/realtek.conf'; then
         echo -e "${h}[+] ${p}Driver bawaan kernel Linux 'r8188eu' berhasil di blacklist.${r}"
 else
         echo -e "${m}[-] ${p}Gagal melakukan blacklist pada driver bawaan kernel Linux 'r8188eu'.${r}"
         exit 1
 fi
-if echo 'blacklist rtl8xxxu' | sudo tee -a '/etc/modprobe.d/realtek.conf'; then
+if echo 'blacklist rtl8xxxu' | tee -a '/etc/modprobe.d/realtek.conf'; then
         echo -e "${h}[+] ${p}Driver bawaan kernel Linux 'rtl8xxxu' berhasil di blacklist.${r}"
 else
         echo -e "${m}[-] ${p}Gagal melakukan blacklist pada driver bawaan kernel Linux 'rtl8xxxu'.${r}"
